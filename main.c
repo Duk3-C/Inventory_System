@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
+// Defining true and false since I don't want to use stdbool.h
 #define TRUE 1
 #define FALSE 0
 
@@ -15,10 +16,11 @@ struct Item
 void addItem();
 void displayItems();
 void searchItems();
-// TODO
+/* TODO
 void editItem();
 void deleteItem();
 void quit();
+*/
 
 int main(void) 
 {
@@ -49,7 +51,7 @@ int main(void)
     case '3':
       searchItems();
       break;
-    case '4':
+    /*case '4':
       editItem();
       break;
     case '5':
@@ -61,6 +63,7 @@ int main(void)
     case 'Q':
       quit();
       break;
+    */
     default:
       printf("Invalid Response, Please try again\n\n");
   }
@@ -112,6 +115,7 @@ void displayItems()
 
   while(fread(&item, sizeof(struct Item), 1, fp))
   {
+    // Display Item Info
     printf("%d\t%s\t%d\t\t%.2f\n", item.id, item.name, item.quantity, item.price);
   }
 
