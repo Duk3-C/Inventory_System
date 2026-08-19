@@ -5,10 +5,10 @@ TARGET = Inventory_System
 $(TARGET): inventory.o
 	$(CC) -o $@ $^
 
-inventory.o: main.c 
-	$(CC) $(CFLAGS) -c main.c
+inventory.o: inventory.c 
+	$(CC) $(CFLAGS) -c inventory.c
 
 clean:
-	rm -rf $(TARGET) inventory.o
+	rm -rf $(TARGET) inventory.o inventory.dat
 
 .PHONY: clean

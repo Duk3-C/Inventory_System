@@ -1,9 +1,7 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 #include <unistd.h>
-
-// Defining true and false since I don't want to use stdbool.h
-#define TRUE 1
-#define FALSE 0
 
 struct Item
 {
@@ -16,6 +14,7 @@ struct Item
 void addItem();
 void displayItems();
 void searchItems();
+void generateID();
 /* TODO
 void editItem();
 void deleteItem();
@@ -24,6 +23,7 @@ void quit();
 
 int main(void) 
 {
+  srand((unsigned)time(NULL));
 
   char in_menu;
 
@@ -39,7 +39,6 @@ int main(void)
   printf("  5 > Delete an Item\n");
   printf("  q/Q > Exit the program\n\n");
   scanf("%c", &in_menu);
-
   switch (in_menu) 
   {
     case '1':
@@ -70,26 +69,32 @@ int main(void)
   return 0;
 }
 
+// Random ID generator
+void generateID()
+{
+  struct Item item;
+  item.id = 1000000 + rand() % 9000000;
+}
+
 void addItem()
 {
   struct Item item;
   FILE *fp;
 
-  fp = fopen("Inventory.dat", "ab");
+  fp = fopen("inventory.dat", "ab");
   if(fp == NULL) 
   {
     printf("Error opening file\n\n");
     return;
   }
 
-  printf("Enter Item ID: ");
-  scanf("%d", &item.id);
   printf("\n\nEnter Item Name: ");
   scanf("%s", item.name);
   printf("\n\nEnter Item Quantity: ");
   scanf("%d", &item.quantity);
   printf("\n\nEnter Item Price: ");
   scanf("%f", &item.price);
+  generateID();
 
   fwrite(&item, sizeof(struct Item), 1, fp);
   fclose(fp);
@@ -103,7 +108,7 @@ void displayItems()
   struct Item item;
   FILE *fp;
 
-  fp = fopen("Inventory.dat", "rb");
+  fp = fopen("inventory.dat", "rb");
   if(fp == NULL)
   {
     printf("Error opening file\n\n");
@@ -126,9 +131,9 @@ void searchItems()
 {
   struct Item item;
   FILE *fp;
-  int id, found = FALSE;
+  int id, found = 0;
 
-  fp = fopen("Inventory.dat", "rb");
+  fp = fopen("inventory.dat", "rb");
   if(fp == NULL) 
   {
     printf("Error opening file\n\n");
@@ -143,15 +148,72 @@ void searchItems()
     if(item.id == id)
     {
       printf("%d\t%s\t%d\t\t%.2f\n", item.id, item.name, item.quantity, item.price);
-      found = TRUE;
+      found = 1;
       break;
     }
   }
 
-  if(found != TRUE)
+  if(found != 1)
   {
     printf("\nItem was not found\n\n");
   }
 
   fclose(fp);
+}
+
+void editItem()
+{
+  int in_menu;
+  system("clear");
+  struct Item item;
+  FILE *fp;
+
+  fp = fopen("inventory.dat", "rb");
+  if(fp == NULL)
+  {
+    printf("Error opening file\n\n");
+    return;
+  }
+
+  for(unsigned long i = 0; i < sizeof(struct Item); ++i)
+  {
+    searchItems();
+
+    printf("\nWhat would you like to do?\n");
+    printf("-------------------------------------\n");
+    printf("1 > Edit Item's name\n");
+    printf("2 > Edit Item's quantity\n");
+    printf("3 > Edit Item's price\n");
+    printf("4 > Create a new ID for the item\n");
+    printf("5 > Go back to main menu\n");
+    scanf("%d", &in_menu);
+
+    switch(in_menu) 
+    {
+      case 1:
+        system("clear");
+        printf("Enter new item's name: ");
+        scanf("%s", item.name);
+        while(fread(&item, sizeof(struct Item), 1, fp))
+        {
+          fseek(fp, -sizeof(struct Item), SEEK_CUR);
+          fwrite(&item, sizeof(struct Item), 1, fp);
+        }
+        break;
+      case 2:
+        break;
+      case 3:
+        break;
+      case 4:
+        break;
+      case 5:
+        main();
+        break;
+      default:
+        printf("\n\nInvalid Answer; please try again");
+        editItem();
+        break;
+    }
+  }
+
 }
