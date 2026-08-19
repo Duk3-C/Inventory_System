@@ -70,15 +70,14 @@ int main(void)
 }
 
 // Random ID generator
-void generateID()
+void generateID(struct Item *item)
 {
-  struct Item item;
-  item.id = 1000000 + rand() % 9000000;
+  item->id = 1000000 + rand() % 9000000;
 }
 
 void addItem()
 {
-  struct Item item;
+  struct Item item = {0};
   FILE *fp;
 
   fp = fopen("inventory.dat", "ab");
@@ -94,7 +93,7 @@ void addItem()
   scanf("%d", &item.quantity);
   printf("\n\nEnter Item Price: ");
   scanf("%f", &item.price);
-  generateID();
+  generateID(&item);
 
   fwrite(&item, sizeof(struct Item), 1, fp);
   fclose(fp);
@@ -165,7 +164,7 @@ void editItem()
 {
   int in_menu;
   system("clear");
-  struct Item item;
+  struct Item item = {0};
   FILE *fp;
 
   fp = fopen("inventory.dat", "rb");
