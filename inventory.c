@@ -14,15 +14,17 @@ struct Item
 void addItem();
 void displayItems();
 void searchItems();
-void generateID();
-/* TODO
+void generateID(struct Item *item);
 void editItem();
+
+/* TODO
 void deleteItem();
 void quit();
 */
 
 int main(void) 
 {
+  system("clear");
   srand((unsigned)time(NULL));
 
   char in_menu;
@@ -50,10 +52,10 @@ int main(void)
     case '3':
       searchItems();
       break;
-    /*case '4':
+    case '4':
       editItem();
       break;
-    case '5':
+    /*case '5':
       deleteItem();
       break;
     case 'q':
@@ -65,6 +67,8 @@ int main(void)
     */
     default:
       printf("Invalid Response, Please try again\n\n");
+      sleep(2);
+      main();
   }
   return 0;
 }
@@ -113,6 +117,8 @@ void displayItems()
     printf("Error opening file\n\n");
     return;
   }
+  printf("Items can also be displayed out of the program through the view_inventory.py program, \nwhich will read and output all items info like this option\n\n");
+  sleep(1);
 
   printf("ID\tName\tQuantity\tPrice\n");
   printf("-----------------------------------\n\n");
@@ -120,7 +126,7 @@ void displayItems()
   while(fread(&item, sizeof(struct Item), 1, fp))
   {
     // Display Item Info
-    printf("%d\t%s\t%d\t\t%.2f\n", item.id, item.name, item.quantity, item.price);
+    printf("%d\t%s\t%d\t\t$%.2f\n", item.id, item.name, item.quantity, item.price);
   }
 
   fclose(fp);
@@ -200,10 +206,19 @@ void editItem()
         }
         break;
       case 2:
+        system("clear");
+        printf("Enter new item's quantity: ");
+        scanf("%d", &item.quantity);
+        while(fread(&item, sizeof(struct Item), 1, fp))
+        {
+          fseek(fp, -sizeof(struct Item), SEEK_CUR);
+          fwrite(&item, sizeof(struct Item), 1, fp);
+        }
         break;
       case 3:
         break;
       case 4:
+        generateID(&item);
         break;
       case 5:
         main();
