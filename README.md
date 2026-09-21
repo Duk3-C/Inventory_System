@@ -1,6 +1,6 @@
 # Inventory System Program
 
-*program is currently on version 0.4.2*
+*program is currently on version 1.0*
 
 ## Features
 
@@ -26,7 +26,6 @@ Currently, this only supports UNIX-based environments
 
 ### Future Changes
 
-* Release v1.0 with all current functions tested and fixed (if any present errors)
 * Add cli functionality
 * Add a better TUI option using ncurses or any other related TUI related library that suits the program
 
