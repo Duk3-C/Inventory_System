@@ -1,6 +1,6 @@
 # Inventory System Program
 
-*program is currently on version 0.4*
+*program is currently on version 0.4.2*
 
 ## Features
 
