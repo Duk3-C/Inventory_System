@@ -1,3 +1,7 @@
+/* TODO
+Nothing at the moment
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -16,11 +20,8 @@ void displayItems();
 void searchItems();
 void generateID(struct Item *item);
 void editItem();
-
-/* TODO
 void deleteItem();
 void quit();
-*/
 
 int main(void) 
 {
@@ -55,7 +56,7 @@ int main(void)
         case '4':
             editItem();
             break;
-        /*case '5':
+        case '5':
             deleteItem();
             break;
         case 'q':
@@ -64,7 +65,6 @@ int main(void)
         case 'Q':
             quit();
             break;
-        */
         default:
             printf("Invalid Response, Please try again\n\n");
             sleep(2);
@@ -237,4 +237,60 @@ void editItem()
         fclose(fp);
     }
 
+}
+
+void deleteItem()
+{
+    struct Item item;
+    int id, found = 0;
+    FILE *fp, *temp;
+
+    fp = fopen("inventory.dat", "rb");
+    if(fp == NULL)
+    {
+        printf("Error opening inventory file\n");
+        return;
+    }
+
+    temp = fopen("temp.dat", "wb");
+    if(temp == NULL)
+    {
+        printf("Error opening temporary file\n");
+        return;
+    }
+
+    printf("Enter item ID to delete: ");
+    scanf("%d", &id);
+
+    while(fread(&item, sizeof(struct Item), 1, fp)) 
+    {
+        if(item.id != id)
+        {
+            fwrite(&item, sizeof(struct Item), 1, temp);
+        } else 
+        {
+            found = 1;
+        }
+    }
+
+    fclose(fp);
+    fclose(temp);
+
+    remove("inventory.dat");
+    rename("temp.dat", "inventory.dat");
+
+    if(found)
+    {
+        printf("Item deleted successfully\n\n");
+    } else
+    {
+        printf("Item not found\n\n");
+    }
+}
+
+void quit()
+{
+    printf("Exiting Program...\n\n");
+    sleep(1);
+    exit(0);
 }
