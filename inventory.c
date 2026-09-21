@@ -169,6 +169,7 @@ void searchItems()
 void editItem()
 {
     int in_menu;
+    int id, found = 0;
     system("clear");
     struct Item item = {0};
     FILE *fp;
@@ -180,50 +181,60 @@ void editItem()
         return;
     }
 
+    printf("\nEnter ID number: ");
+    scanf("%d", &id);
 
-
-    printf("\nWhat would you like to do?\n");
-    printf("-------------------------------------\n");
-    printf("1 > Edit Item's name\n");
-    printf("2 > Edit Item's quantity\n");
-    printf("3 > Edit Item's price\n");
-    printf("4 > Create a new ID for the item\n");
-    printf("5 > Go back to main menu\n");
-    scanf("%d", &in_menu);
-
-    switch(in_menu) 
+    while(fread(&item, sizeof(struct Item), 1, fp))
     {
-        case 1:
-            system("clear");
-            printf("Enter new item's name: ");
-            scanf("%s", item.name);
-            while(fread(&item, sizeof(struct Item), 1, fp))
+        if(item.id == id)
+        {
+            found = 1;
+
+            printf("\nCurrent Item:\n");
+            printf("ID: %d  |   Name: %s    |   Quantity: %d    |   Price: $%.2f\n\n",
+                    item.id,    item.name,      item.quantity,      item.price);
+
+            printf("What would you like to edit?\n");
+            printf(" 1> Name\n");
+            printf(" 2> Quantity\n");
+            printf(" 3> Price\n");
+            scanf("%d", &in_menu);
+            
+            switch(in_menu)
             {
-                fseek(fp, -sizeof(struct Item), SEEK_CUR);
-                fwrite(&item, sizeof(struct Item), 1, fp);
+                case 1:
+                    printf("\n\nEnter new item name\n");
+                    scanf("%s", item.name);
+                    break;
+                case 2:
+                    printf("\n\nEnter new item quantity\n");
+                    scanf("%d", &item.quantity);
+                    break;
+                case 3:
+                    printf("\n\nEnter new item price\n");
+                    scanf("%f", &item.price);
+                    break;
+                case 4:
+                    fclose(fp);
+                    return;
+                default:
+                    printf("Invalid Choice\n\n");
+                    fclose(fp);
+                    return;
             }
+
+            fseek(fp, -sizeof(struct Item), SEEK_CUR);
+            fwrite(&item, sizeof(struct Item), 1, fp);
+            printf("Item successfully updated\n\n");
             break;
-        case 2:
-            system("clear");
-            printf("Enter new item's quantity: ");
-            scanf("%d", &item.quantity);
-            while(fread(&item, sizeof(struct Item), 1, fp))
-            {
-                fseek(fp, -sizeof(struct Item), SEEK_CUR);
-                fwrite(&item, sizeof(struct Item), 1, fp);
-            }
-            break;
-        case 3:
-            break;
-        case 4:
-            generateID(&item);
-            break;
-        case 5:
-            main();
-            break;
-        default:
-            printf("\n\nInvalid Answer; please try again");
-            editItem();
-            break;
+        }
+
+        if(!found)
+        {
+            printf("Item not found\n\n");
+        }
+
+        fclose(fp);
     }
+
 }
