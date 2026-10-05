@@ -23,3 +23,5 @@ Based on my research, SKUs are the series of letters and numbers used for identi
 
 It would be a good option for the item value flags to be used alongside other flags like --ls, to list all available items that match the value.
 It is necessary to create a manual for the cli even if the tool is not that big.
+
+After being done with SKUs implementation, I will go ahead and change the TUI look of the program via use of the ncurses library.
