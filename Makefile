@@ -12,3 +12,4 @@ clean:
 	rm -rf $(TARGET) inventory.o inventory.dat
 
 .PHONY: clean
+
