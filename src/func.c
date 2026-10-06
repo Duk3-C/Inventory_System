@@ -1,99 +1,4 @@
-/* TODO
-    [X] - check debugger for errors
-    [X] - add comments to give more context of each function
-    [ ] - Implement cli functionality
-    [ ] - Implement a better way of accounting item IDs
-*/
-
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <unistd.h>
-
-
-// structure for items value management
-struct Item
-{
-    int id;
-    char name[40];
-    int quantity;
-    float price;
-};
-
-
-// declaring inventory management functions
-void addItem();
-void displayItems();
-void searchItems();
-void generateID(struct Item *item);
-void editItem();
-void deleteItem();
-void quit();
-
-
-// Main Function
-int main(void) 
-{
-    system("clear");
-    
-    // Random Seed
-    srand((unsigned)time(NULL));
-
-
-    // TUI menu
-    char in_menu;
-
-    // do while loop to make the program 
-    // go back to main menu after completing 
-    // a task
-    do {
-        printf("\n\n\n");
-        printf("================================================\n");
-        printf("=         Inventory Management System          =\n");
-        printf("================================================\n\n");
-        printf("  Options:\n\n");
-        printf("------------------------------------------------\n\n");
-        printf("  1 > Add a new item\n");
-        printf("  2 > Display Items\n");
-        printf("  3 > Search Items\n");
-        printf("  4 > Edit an Item\n");
-        printf("  5 > Delete an Item\n");
-        printf("  q/Q > Exit the program\n\n");
-        scanf("%c", &in_menu);
-        switch (in_menu) 
-        {
-            case '1':
-                addItem();
-                break;
-            case '2':
-                displayItems();
-                break;
-            case '3':
-                searchItems();
-                break;
-            case '4':
-                editItem();
-                break;
-            case '5':
-                deleteItem();
-                break;
-            case 'q':
-                quit();
-                break;
-            case 'Q':
-                quit();
-                break;
-            default:
-                printf("Invalid Response, Please try again\n\n");
-                sleep(2);
-                main();
-        }
-    } while(in_menu != 'q' && in_menu != 'Q');
-
-    return 0;
-}
-
+#include "func.h"
 
 // Random ID generator
 void generateID(struct Item *item)
@@ -101,6 +6,10 @@ void generateID(struct Item *item)
     item->id = 1000000 + rand() % 9000000;
 }
 
+void addSKU()
+{
+    return;
+}
 
 // Very Self-explanatory
 void addItem()

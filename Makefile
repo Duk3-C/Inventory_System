@@ -1,15 +1,14 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -std=gnu11
-TARGET = Inventory_System
+TARGET = inventory
 
-$(TARGET): inventory.o
+$(TARGET): prog.o
 	$(CC) -o $@ $^
 
-inventory.o: inventory.c 
-	$(CC) $(CFLAGS) -c inventory.c
+prog.o: prog.c 
+	$(CC) $(CFLAGS) -c prog.c
 
 clean:
-	rm -rf $(TARGET) inventory.o inventory.dat
+	rm -rf $(TARGET) prog.o inventory.dat
 
 .PHONY: clean
-
