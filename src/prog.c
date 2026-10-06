@@ -2,7 +2,7 @@
     [X] - check debugger for errors
     [X] - add comments to give more context of each function
     [ ] - Implement cli functionality
-    [ ] - Implement a better way of accounting item IDs
+    [X] - Implement a better way of accounting item IDs
 */
 
 

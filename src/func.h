@@ -6,7 +6,7 @@
 
 struct Item
 {
-    int id;
+    char SKU[14];
     char name[40];
     int quantity;
     float price;

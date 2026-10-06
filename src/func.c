@@ -1,15 +1,5 @@
 #include "func.h"
-
-// Random ID generator
-void generateID(struct Item *item)
-{
-    item->id = 1000000 + rand() % 9000000;
-}
-
-void addSKU()
-{
-    return;
-}
+#include <stdio.h>
 
 // Very Self-explanatory
 void addItem()
@@ -24,15 +14,15 @@ void addItem()
         return;
     }
 
-
     // Item creation
+    printf("Enter the SKU designated for your new item");
+    scanf("%s", item.SKU);
     printf("\n\nEnter Item Name: ");
     scanf("%s", item.name);
     printf("\n\nEnter Item Quantity: ");
     scanf("%d", &item.quantity);
     printf("\n\nEnter Item Price: ");
     scanf("%f", &item.price);
-    generateID(&item);
 
     // write to data file
     fwrite(&item, sizeof(struct Item), 1, fp);
@@ -40,7 +30,6 @@ void addItem()
 
     sleep(1); // unnecessary but I like wait times between actions
     printf("\n\nItem was added successfully\n\n");
-
 }
 
 
