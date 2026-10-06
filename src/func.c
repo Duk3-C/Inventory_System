@@ -51,14 +51,14 @@ void displayItems()
     printf("Items can also be displayed out of the program through the view_inventory.py program, \nwhich will read and output all items info like this option\n\n");
     sleep(1);
 
-    printf("ID\tName\tQuantity\tPrice\n");
+    printf("SKU\tName\tQuantity\tPrice\n");
     printf("-----------------------------------\n\n");
 
     while(fread(&item, sizeof(struct Item), 1, fp))
     {
         // Display Item Info
-        printf("%d\t%s\t%d\t\t$%.2f\n", 
-                item.id, item.name, item.quantity, item.price);
+        printf("%s\t%s\t%d\t\t$%.2f\n", 
+                item.SKU, item.name, item.quantity, item.price);
     }
 
     fclose(fp);
@@ -68,7 +68,8 @@ void searchItems()
 {
     struct Item item;
     FILE *fp;
-    int id, found = 0; // int found is basically a boolean
+    char SKU[14];
+    int found = 0; // int found is basically a boolean
                        // I didn't want to use the stdbool.h file 
                        // for this, so instead I used the good old way
 
@@ -79,16 +80,16 @@ void searchItems()
         return;
     }
 
-    printf("Enter Item ID: ");
-    scanf("%d", &id);
+    printf("Enter Item SKU: ");
+    scanf("%s", SKU);
 
     while(fread(&item, sizeof(struct Item), 1, fp))
     {
-        if(item.id == id)
+        if(item.SKU == SKU)
         {
             // Display Item Info
-            printf("%d\t%s\t%d\t\t%.2f\n", 
-                    item.id, item.name, item.quantity, item.price);
+            printf("%s\t%s\t%d\t\t%.2f\n", 
+                    item.SKU, item.name, item.quantity, item.price);
             found = 1; // found returns true
             break;
         }
@@ -106,7 +107,8 @@ void searchItems()
 void editItem()
 {
     int in_menu;
-    int id, found = 0;
+    char SKU[14];
+    int found = 0;
     system("clear");
 
     // item needs to be set to 0 for this use case
@@ -122,18 +124,18 @@ void editItem()
     }
 
     printf("\nEnter ID number: ");
-    scanf("%d", &id);
+    scanf("%s", SKU);
 
     while(fread(&item, sizeof(struct Item), 1, fp))
     {
-        if(item.id == id)
+        if(item.SKU == SKU)
         {
             found = 1;
 
             // displaying item info for the user to verify whether it is the right one
             printf("\nCurrent Item:\n");
-            printf("ID: %d  |   Name: %s    |   Quantity: %d    |   Price: $%.2f\n\n",
-                    item.id,    item.name,      item.quantity,      item.price);
+            printf("SKU: %s  |   Name: %s    |   Quantity: %d    |   Price: $%.2f\n\n",
+                    item.SKU,    item.name,      item.quantity,      item.price);
 
 
             printf("What would you like to edit?\n");
@@ -187,7 +189,8 @@ void editItem()
 void deleteItem()
 {
     struct Item item;
-    int id, found = 0;
+    char SKU[14];
+    int found = 0;
     FILE *fp, *temp;
 
     fp = fopen("inventory.dat", "rb");
@@ -208,11 +211,11 @@ void deleteItem()
     }
 
     printf("Enter item ID to delete: ");
-    scanf("%d", &id);
+    scanf("%s", SKU);
 
     while(fread(&item, sizeof(struct Item), 1, fp)) 
     {
-        if(item.id != id)
+        if(item.SKU != SKU)
         {
             fwrite(&item, sizeof(struct Item), 1, temp);
         } else 
