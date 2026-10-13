@@ -12,6 +12,7 @@ struct Item
     float price;
 };
 
+void menu();
 void generateID(struct Item *item);
 void addSKU();
 void addItem();

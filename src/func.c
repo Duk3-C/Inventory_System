@@ -1,7 +1,67 @@
 #include "func.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 // Very Self-explanatory
+
+void menu()
+{
+    system("clear");
+    
+    // Random Seed
+    srand((unsigned)time(NULL));
+
+
+    // TUI menu
+    char in_menu;
+
+    // do while loop to make the program 
+    // go back to main menu after completing 
+    // a task
+    printf("\n\n\n");
+    printf("================================================\n");
+    printf("=         Inventory Management System          =\n");
+    printf("================================================\n\n");
+    printf("  Options:\n\n");
+    printf("------------------------------------------------\n\n");
+    printf("  1 > Add a new item\n");
+    printf("  2 > Display Items\n");
+    printf("  3 > Search Items\n");
+    printf("  4 > Edit an Item\n");
+    printf("  5 > Delete an Item\n");
+    printf("  q/Q > Exit the program\n\n");
+    scanf(" %c", &in_menu);
+    switch (in_menu) 
+    {
+        case '1':
+            addItem();
+            break;
+        case '2':
+            displayItems();
+            break;
+        case '3':
+            searchItems();
+            break;
+        case '4':
+            editItem();
+            break;
+        case '5':
+            deleteItem();
+            break;
+        case 'q':
+            quit();
+            break;
+        case 'Q':
+            quit();
+            break;
+        default:
+            printf("Invalid Response, Please try again\n\n");
+            sleep(2);
+            menu();
+    }
+
+}
+
 void addItem()
 {
     struct Item item = {0};
@@ -30,6 +90,8 @@ void addItem()
 
     sleep(1); // unnecessary but I like wait times between actions
     printf("\n\nItem was added successfully\n\n");
+
+    menu();
 }
 
 
@@ -47,10 +109,6 @@ void displayItems()
         return;
     }
 
-    // Note for people that may want to use the .py file instead
-    printf("Items can also be displayed out of the program through the view_inventory.py program, \nwhich will read and output all items info like this option\n\n");
-    sleep(1);
-
     printf("SKU\tName\tQuantity\tPrice\n");
     printf("-----------------------------------\n\n");
 
@@ -60,8 +118,17 @@ void displayItems()
         printf("%s\t%s\t%d\t\t$%.2f\n", 
                 item.SKU, item.name, item.quantity, item.price);
     }
-
+    char in;
+    printf("Press 'M' to continue to main menu\n");
+    scanf(" %c", &in);
     fclose(fp);
+    if(in == 'M' || in == 'm')
+    {
+        menu();
+    } else {
+        exit(0);
+    }
+
 }
 
 void searchItems()
