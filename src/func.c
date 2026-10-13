@@ -166,6 +166,20 @@ void searchItems()
     }
 
     fclose(fp);
+
+    char in;
+    printf("Would you like to go to main menu? y/n\n\n");
+    scanf(" %c", &in);
+    if(in == 'y')
+    {
+        menu();
+    } else if(in == 'n')
+    {
+        quit();
+    } else {
+        quit();
+    }
+
 }
 
 void editItem()
@@ -244,6 +258,19 @@ void editItem()
     if(found != 1) printf("Item not found\n\n");
     fclose(fp);
 
+    char in;
+    printf("Would you like to go to main menu? y/n\n\n");
+    scanf(" %c", &in);
+    if(in == 'y')
+    {
+        menu();
+    } else if(in == 'n')
+    {
+        quit();
+    } else {
+        quit();
+    }
+
 }
 
 void deleteItem()
@@ -275,7 +302,7 @@ void deleteItem()
 
     while(fread(&item, sizeof(struct Item), 1, fp)) 
     {
-        if(strcmp(item.SKU, SKU) == 1)
+        if(strcmp(item.SKU, SKU) != 0)
         {
             fwrite(&item, sizeof(struct Item), 1, temp);
         } else 
@@ -299,6 +326,20 @@ void deleteItem()
     {
         printf("Item not found\n\n");
     }
+
+    char in;
+    printf("Would you like to go to main menu? y/n\n\n");
+    scanf(" %c", &in);
+    if(in == 'y')
+    {
+        menu();
+    } else if(in == 'n')
+    {
+        quit();
+    } else {
+        quit();
+    }
+
 }
 
 // Very simple function to exit the program
