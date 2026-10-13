@@ -1,6 +1,4 @@
 #include "func.h"
-#include <stdio.h>
-#include <stdlib.h>
 
 // Very Self-explanatory
 
@@ -137,8 +135,8 @@ void searchItems()
     FILE *fp;
     char SKU[14];
     int found = 0; // int found is basically a boolean
-                       // I didn't want to use the stdbool.h file 
-                       // for this, so instead I used the good old way
+                   // I didn't want to use the stdbool.h file 
+                   // for this, so instead I used the good old 1 & 0
 
     fp = fopen("inventory.dat", "rb");
     if(fp == NULL) 
@@ -152,11 +150,10 @@ void searchItems()
 
     while(fread(&item, sizeof(struct Item), 1, fp))
     {
-        if(item.SKU == SKU)
+        if(strcmp(item.SKU, SKU) == 0)
         {
             // Display Item Info
-            printf("%s\t%s\t%d\t\t%.2f\n", 
-                    item.SKU, item.name, item.quantity, item.price);
+            printf("%s\t%s\t%d\t%.2f\n", item.SKU, item.name, item.quantity, item.price);
             found = 1; // found returns true
             break;
         }
@@ -195,7 +192,7 @@ void editItem()
 
     while(fread(&item, sizeof(struct Item), 1, fp))
     {
-        if(item.SKU == SKU)
+        if(strcmp(item.SKU, SKU) == 0)
         {
             found = 1;
 
@@ -243,13 +240,9 @@ void editItem()
             break;
         }
 
-        if(found != 1)
-        {
-            printf("Item not found\n\n");
-        }
-
-        fclose(fp);
     }
+    if(found != 1) printf("Item not found\n\n");
+    fclose(fp);
 
 }
 
@@ -282,7 +275,7 @@ void deleteItem()
 
     while(fread(&item, sizeof(struct Item), 1, fp)) 
     {
-        if(item.SKU != SKU)
+        if(strcmp(item.SKU, SKU) == 1)
         {
             fwrite(&item, sizeof(struct Item), 1, temp);
         } else 
@@ -312,6 +305,5 @@ void deleteItem()
 void quit()
 {
     printf("Exiting Program...\n\n");
-    sleep(1);
     exit(0);
 }
