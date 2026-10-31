@@ -1,6 +1,7 @@
 #include "func.h"
+#include <bits/getopt_core.h>
 #include <bits/getopt_ext.h>
-#include <cstdio>
+
 
 static struct option opts[] =
 {
@@ -13,19 +14,45 @@ static struct option opts[] =
     {0, 0, 0, 0}
 };
 
+void parser(int argc, char **argv)
+{
+    int command;
+    while((command = getopt_long(argc, argv, "ha:le:d:f:", opts, NULL)) != -1)
+    {
+        switch(command)
+        {
+            case 'h':   cmd_help();     break;
+            case 'a':   cmd_add_item(optarg);      break;
+            case 'l':   cmd_list();     break;
+            case 'e':   cmd_edit();     break;
+            case 'd':   cmd_delete();   break;
+            case 'f':   cmd_find();     break;
+            default:                    break;
+        }
+    }
+}
+
 void cmd_help()
 {
     printf("Usage: ./inventory [OPTIONS]\n"
-           "--add [NAME, SKU, PRICE, QUANTITY]                       - Add a new item\n"
+           "--add [SKU, NAME, QUANTITY, PRICE]                     - Add a new item\n"
            "--list                                                 - Lists all items inside the inventory database\n" 
-           "--edit [SKU] [NAME, SKU, PRICE, QUANTITY]              - Edit an item, either its name, SKU, price, or quantity\n"
+           "--edit [SKU] SKU || NAME || QUANTITY || PRICE              - Edit an item, either its name, SKU, price, or quantity\n"
            "--delete [SKU]                                         - Delete an item\n"
            "--find [SKU]                                           - Find an item by its SKU\n"
             );
     return;
 }
 
-void cmd_add_item()
+void cmd_add_item(char *text)
 {
-    fp = fopen("inventory.dat");
+    struct Item *item;
+    FILE *fp = fopen(DATA_FILE, "wb");
+    if(fp == NULL)
+    {
+        printf("file was not found\n");
+    }
+
+    if(!text) { printf("incomplete input; refer to --help to see available options\n"); }; 
+
 }

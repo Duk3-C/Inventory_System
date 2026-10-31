@@ -9,6 +9,7 @@
 
 #define ITEM_NAME_LEN   256
 #define SKU_LEN         15  // 14 chars + '\0' NULL
+#define DATA_FILE       "inventory.dat"
 
 typedef struct {
     char    SKU[SKU_LEN];
@@ -17,8 +18,9 @@ typedef struct {
     double  price;
 } Item;
 
+void parser(int argc, char **argv);
 void cmd_help();
-void cmd_add_item();
+void cmd_add_item(char *text);
 void cmd_list();
 void cmd_search();
 void cmd_edit();
