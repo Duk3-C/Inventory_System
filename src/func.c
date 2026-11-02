@@ -1,4 +1,4 @@
-#include "func.h"
+#include "lib.h"
 #include <bits/getopt_core.h>
 #include <bits/getopt_ext.h>
 #include <stdio.h>
@@ -25,7 +25,7 @@ void parser(int argc, char **argv)
             case 'h':   cmd_help();     break;
             case 'a':   cmd_add_item(optarg);      break;
             case 'l':   cmd_list();     break;
-            //case 'e':   cmd_edit();     break;
+            case 'e':   cmd_edit(optarg);     break;
             //case 'd':   cmd_delete();   break;
             //case 'f':   cmd_find();     break;
             default:                    break;
@@ -38,14 +38,16 @@ void cmd_help()
     printf("Usage: ./inventory [OPTIONS]\n"
            "--add [SKU, NAME, QUANTITY, PRICE]                     - Add a new item\n"
            "--list                                                 - Lists all items inside the inventory database\n" 
-           "--edit [SKU] SKU || NAME || QUANTITY || PRICE              - Edit an item, either its name, SKU, price, or quantity\n"
+           "--edit 'SKU new FIELD NEW_VALUE'\n                     - Edit an item, either its name, SKU, price, or quantity. No more than one value can be changed at a time at the moment\n"
+           "                                                         FIELDS: SKU,   NAME,   QUANTITY,   PRICE\n"
            "--delete [SKU]                                         - Delete an item\n"
            "--find [SKU]                                           - Find an item by its SKU\n"
             );
     return;
 }
 
-void cmd_add_item(char *text)
+void cmd_add_item(
+        char *text)
 {
     Item item = {0};
 
@@ -90,7 +92,7 @@ void cmd_add_item(char *text)
     fclose(fp);
 }
 
-void cmd_list()
+void cmd_list(void)
 {
     Item item;
     FILE *fp = fopen(DATA_FILE, "rb");
@@ -103,10 +105,19 @@ void cmd_list()
 
     while(fread(&item, sizeof item, 1, fp) == 1)
     {
-        printf("%-15s | %-30s | %8d | %10.2f",
+        printf("%-15s | %-30s | %8d | %10.2f\n",
                 item.SKU, item.name, item.quantity, item.price);
     }
+    fclose(fp);
+}
+
+#define TEMP_FILE   "inventory.dat.tmp"
+void cmd_edit(char *text)
+{
+    Item item = {0};
+    FILE *fp = fopen(DATA_FILE, "rb");
+
+    if(fp == NULL) { fprintf(stderr, "No contents in inventory\n"); return; }
 
     fclose(fp);
-
 }
