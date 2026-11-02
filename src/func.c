@@ -1,6 +1,7 @@
 #include "func.h"
 #include <bits/getopt_core.h>
 #include <bits/getopt_ext.h>
+#include <stdio.h>
 
 
 static struct option opts[] =
@@ -24,9 +25,9 @@ void parser(int argc, char **argv)
             case 'h':   cmd_help();     break;
             case 'a':   cmd_add_item(optarg);      break;
             case 'l':   cmd_list();     break;
-            case 'e':   cmd_edit();     break;
-            case 'd':   cmd_delete();   break;
-            case 'f':   cmd_find();     break;
+            //case 'e':   cmd_edit();     break;
+            //case 'd':   cmd_delete();   break;
+            //case 'f':   cmd_find();     break;
             default:                    break;
         }
     }
@@ -46,13 +47,66 @@ void cmd_help()
 
 void cmd_add_item(char *text)
 {
-    struct Item *item;
-    FILE *fp = fopen(DATA_FILE, "wb");
-    if(fp == NULL)
+    Item item = {0};
+
+    if(sscanf(text, "%14[^,], %255[^,], %d, %lf",
+                item.SKU, item.name, &item.quantity, &item.price) != 4)
     {
-        printf("file was not found\n");
+        fprintf(stderr, 
+                "Usage: --add \"SKU,NAME,QUANTITY,PRICE\"\n"
+                "       --help to learn more\n");
+        return;
     }
 
-    if(!text) { printf("incomplete input; refer to --help to see available options\n"); }; 
+    if(item.quantity < 0 || item.price < 0)
+    {
+        fprintf(stderr,
+                "Invalid amount entered\n");
+        return;
+    }
+
+    FILE *fp_existing = fopen(DATA_FILE, "rb");
+    if(fp_existing != NULL)
+    {
+        Item existing;
+        while(fread(&existing, sizeof existing, 1, fp_existing) == 1) 
+        {
+            if(strcmp(existing.SKU, item.SKU) == 0)
+            {
+                fclose(fp_existing);
+                fprintf(stderr,
+                        "SKU %s already exists\n",
+                        item.SKU);
+                return;
+            }
+        }
+        fclose(fp_existing);
+    }
+
+    FILE *fp = fopen(DATA_FILE, "ab");
+    if(fp == NULL) { perror(DATA_FILE); return; }
+    
+    if(fwrite(&item, sizeof item, 1, fp) != 1) { perror("fwrite"); }
+    fclose(fp);
+}
+
+void cmd_list()
+{
+    Item item;
+    FILE *fp = fopen(DATA_FILE, "rb");
+    
+    if(fp == NULL) { fprintf(stderr, "No contents in inventory\n"); return; }
+
+    printf("%-15s | %-30s | %8s | %10s\n",
+            "SKU", "NAME", "QUANTITY", "PRICE");
+    printf("---------------------------------------------------------------\n");
+
+    while(fread(&item, sizeof item, 1, fp) == 1)
+    {
+        printf("%-15s | %-30s | %8d | %10.2f",
+                item.SKU, item.name, item.quantity, item.price);
+    }
+
+    fclose(fp);
 
 }
