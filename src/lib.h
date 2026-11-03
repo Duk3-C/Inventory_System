@@ -1,5 +1,5 @@
-#ifndef FUNC_H
-#define FUNC_H
+#ifndef LIB_H
+#define LIB_H
 
 #include <stdio.h>
 #include <getopt.h>
