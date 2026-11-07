@@ -15,6 +15,7 @@
 #define ITEM_NAME_LEN   256
 #define SKU_LEN         15  // 14 chars + '\0' NULL
 #define DATA_FILE       "inventory.dat"
+#define TEMP_FILE       "inventory.dat.tmp"
 
 typedef struct {
     char    SKU[SKU_LEN];

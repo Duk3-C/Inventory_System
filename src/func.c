@@ -1,6 +1,7 @@
 #include "lib.h"
 #include <bits/getopt_core.h>
 #include <bits/getopt_ext.h>
+#include <limits.h>
 #include <stdio.h>
 
 
@@ -111,13 +112,171 @@ void cmd_list(void)
     fclose(fp);
 }
 
-#define TEMP_FILE   "inventory.dat.tmp"
 void cmd_edit(char *text)
 {
-    Item item = {0};
-    FILE *fp = fopen(DATA_FILE, "rb");
+    // Parser variables
+    char cur_sku[SKU_LEN];
+    char keyword[8]; // 'new' keyword
+    char field_name[16];
+    char value[ITEM_NAME_LEN];
+    Field field;
 
-    if(fp == NULL) { fprintf(stderr, "No contents in inventory\n"); return; }
+    if(sscanf(text, "%14s %7s %15s %255[^\n]",
+                cur_sku, keyword, field_name, value) != 4 ||
+            sscanf(keyword, "new") != 0)
+    {
+        fprintf(stderr, "Usage: --edit \"SKU new FIELD NEW_VALUE\"\n"
+                        "       FIELD: SKU, NAME, QUANTITY, PRICE\n"
+                        "       For more info, use --help\n"
+                );
+        return;
+    }
 
-    fclose(fp);
+    if(parse_field(field_name, &field) != 0)
+    {
+        fprintf(stderr, "Unknown field %s\n", field_name);
+        return;
+    }
+
+    // Validating fields
+
+    int new_quantity = 0;
+    double new_price = 0.0;
+
+    switch(field)
+    {
+        case FIELD_SKU:
+            if(value[0] != '\0' || strlen(value) >= SKU_LEN)
+            {
+                fprintf(stderr,
+                        "Value can only be of size 1-%d\n",
+                        SKU_LEN-1);
+                return;
+            }
+            break;
+        case FIELD_NAME:
+            if(value[0] != '\0' || strlen(value) >= ITEM_NAME_LEN)
+            {
+                fprintf(stderr,
+                        "Value has to be of size 1-%d\n",
+                        ITEM_NAME_LEN-1);
+                return;
+            }
+            break;
+        case FIELD_QUANTITY:
+            char *end;
+            errno = 0;
+            long quant = strtol(value, &end, 10);
+            if(errno != 0 || end == value || *end != '\0' || quant < 0 || quant > INT_MAX) 
+            {
+                fprintf(stderr,
+                        "Quantity must be a non-negative integer\n");
+                return;
+            }
+            new_quantity = (int)quant;
+            break;
+        case FIELD_PRICE:
+            char *end;
+            errno = 0;
+            double price = strtod(value, &end);
+            if(errno != 0 || end == value || *end != '\0' || !isfinite(price) || price < 0.0)
+            {
+                fprintf(stderr,
+                        "Price must be a non-negative number\n");
+                return;
+            }
+            break;
+    }
+
+    FILE *in = fopen(DATA_FILE, "rb");
+    if(in == NULL)
+    {
+        fprintf(stderr,
+                "No inventory found\n");
+        return;
+    }
+
+    FILE *out = fopen(TEMP_FILE, "wb");
+    if(out == NULL)
+    {
+        perror(TEMP_FILE);
+        fclose(in); // if second condition fails, close first file
+        return;
+    }
+
+    Item item;
+    int found = 0;
+    int failed = 0;
+    int collision = 0;
+
+    while(fread(&item, sizeof item, 1, in) == 1)
+    {
+        if(!found && strcmp(item.SKU, cur_sku) == 0)
+        {
+            found = 1;
+            switch(field)
+            {
+                case FIELD_SKU:
+                    snprintf(item.SKU, sizeof item.SKU, "%s", value);
+                    break;
+                case FIELD_NAME:
+                    snprintf(item.name, sizeof item.name, "%s", value);
+                    break;
+                case FIELD_QUANTITY:
+                    item.quantity = new_quantity;
+                    break;
+                case FIELD_PRICE:
+                    item.price = new_price;
+                    break;
+            }
+        } else if (field == FIELD_SKU && strcmp(item.SKU, value) == 0)
+        {
+            collision = 1; // This means the new SKU entered by the user already belongs to another item
+        }
+
+        if(fwrite(&item, sizeof item, 1, out) != 1)
+        {
+            failed = 1;
+            break;
+        }
+    }
+
+    if(ferror(in)) 
+        failed =1;
+
+    fclose(in);
+    if(fclose(out) != 0)
+        failed = 1;
+
+    if(failed)
+    {
+        remove(TEMP_FILE);
+        fprintf(stderr,
+                "Edit failed. Inventory left unchanged\n");
+        return;
+    }
+    if(!found)
+    {
+        remove(TEMP_FILE);
+        fprintf(stderr,
+                "SKU %s not found\n", cur_sku);
+        return;
+    }
+    if(collision)
+    {
+        remove(TEMP_FILE);
+        fprintf(stderr,
+                "SKU %s already exists\n", cur_sku);
+        return;
+    }
+
+    if(rename(TEMP_FILE, DATA_FILE) != 0)
+    {
+        perror("rename");
+        remove(TEMP_FILE);
+        return;
+    }
+
+    printf("Updated %s: %s = %s\n", cur_sku, field_name, value);
+
 }
