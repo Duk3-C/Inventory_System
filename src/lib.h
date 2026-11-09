@@ -41,7 +41,7 @@ void cmd_add_item(char *text);
 void cmd_list();
 void cmd_search();
 void cmd_edit(char *text);
-void cmd_delete();
+void cmd_delete(char *text);
 void cmd_find(); // same as searchItem function in the TUI version of the program
 
 #endif

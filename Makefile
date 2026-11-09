@@ -7,7 +7,7 @@ OBJS = $(SRCS:.c=.o)
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $^
 
-%.o: %.c src/func.h 
+%.o: %.c src/lib.h 
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:

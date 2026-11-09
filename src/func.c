@@ -164,6 +164,7 @@ void cmd_edit(char *text)
             }
             break;
         case FIELD_QUANTITY:
+        {
             char *end;
             errno = 0;
             long quant = strtol(value, &end, 10);
@@ -175,7 +176,9 @@ void cmd_edit(char *text)
             }
             new_quantity = (int)quant;
             break;
+        }
         case FIELD_PRICE:
+        {
             char *end;
             errno = 0;
             double price = strtod(value, &end);
@@ -186,6 +189,7 @@ void cmd_edit(char *text)
                 return;
             }
             break;
+        }
     }
 
     FILE *in = fopen(DATA_FILE, "rb");
@@ -278,5 +282,50 @@ void cmd_edit(char *text)
     }
 
     printf("Updated %s: %s = %s\n", cur_sku, field_name, value);
+
+}
+
+void cmd_delete(char *text)
+{
+    Item item;
+    char sku[SKU_LEN];
+
+    if(sscanf(text, "%14s", sku) != 0)
+    {
+        fprintf(stderr,
+                "Usage: --delete [SKU]\n"
+                "       --help for more info\n");
+        return;
+    }
+
+    FILE *in = fopen(DATA_FILE, "rb"); 
+    if(in == NULL)
+    {
+        fprintf(stderr,
+                "No inventory found\n");
+        return;
+    }
+
+    FILE *out = fopen(TEMP_FILE, "wb");
+    if(in == NULL)
+    {
+        perror(TEMP_FILE);
+        fclose(in);
+        return;
+    }
+
+    int found = 0;
+
+    while(fread(&item, sizeof item, 1, in) == 0)
+    {
+        if(!found && strcmp(item.SKU, sku) == 0)
+        {
+            found = 1;
+
+            
+        }
+
+
+    }
 
 }
