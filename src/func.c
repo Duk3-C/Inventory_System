@@ -27,7 +27,7 @@ void parser(int argc, char **argv)
             case 'a':   cmd_add_item(optarg);      break;
             case 'l':   cmd_list();     break;
             case 'e':   cmd_edit(optarg);     break;
-            //case 'd':   cmd_delete();   break;
+            case 'd':   cmd_delete(optarg);   break;
             //case 'f':   cmd_find();     break;
             default:                    break;
         }
@@ -288,12 +288,12 @@ void cmd_edit(char *text)
 void cmd_delete(char *text)
 {
     Item item;
-    char sku[SKU_LEN];
+    char sku[64];
 
-    if(sscanf(text, "%14s", sku) != 0)
+    if(sscanf(text, "%63s", sku) != 1 || strlen(sku) >= SKU_LEN)
     {
         fprintf(stderr,
-                "Usage: --delete [SKU]\n"
+                "Usage: --delete \"SKU\"\n"
                 "       --help for more info\n");
         return;
     }
@@ -315,17 +315,54 @@ void cmd_delete(char *text)
     }
 
     int found = 0;
+    int failed = 0;
 
-    while(fread(&item, sizeof item, 1, in) == 0)
+    while(fread(&item, sizeof item, 1, in) == 1)
     {
-        if(!found && strcmp(item.SKU, sku) == 0)
+        if(strcmp(item.SKU, sku) == 0)
         {
             found = 1;
-
-            
+            continue;
         }
 
+        if(fwrite(&item, sizeof item, 1, out) != 1)
+        {
+            failed = 1;
+            break;
+        }
 
     }
+
+    if(ferror(in))
+        failed = 1;
+
+    fclose(in);
+    if(fclose(out) != 0)
+        failed = 1;
+
+    if(failed)
+    {
+        remove(TEMP_FILE);
+        fprintf(stderr,
+                "Delete failed\n");
+        return;
+    }
+
+    if(!found)
+    {
+        remove(TEMP_FILE);
+        fprintf(stderr,
+                "Item not found, no changes were made\n");
+        return;
+    }
+
+    if(rename(TEMP_FILE, DATA_FILE) != 0)
+    {
+        perror("rename");
+        remove(TEMP_FILE);
+        return;
+    }
+
+    printf("Item %s was successfully deleted\n", sku);
 
 }
