@@ -28,7 +28,7 @@ void parser(int argc, char **argv)
             case 'l':   cmd_list();     break;
             case 'e':   cmd_edit(optarg);     break;
             case 'd':   cmd_delete(optarg);   break;
-            //case 'f':   cmd_find();     break;
+            case 'f':   cmd_find(optarg);     break;
             default:                    break;
         }
     }
@@ -365,4 +365,60 @@ void cmd_delete(char *text)
 
     printf("Item %s was successfully deleted\n", sku);
 
+}
+
+void cmd_find(char *text)
+{
+    Item item;
+    char sku[64];
+    int found = 0;
+
+    if(sscanf(text, "%63s", sku) != 1 || strlen(sku) >= SKU_LEN)
+    {
+        fprintf(stderr,
+                "Usage: --find \"SKU\""
+                "       --help for more info");
+        return;
+    }
+
+    FILE *fp = fopen(DATA_FILE, "rb");
+    if(fp == NULL)
+    {
+        fprintf(stderr,
+                "No inventory found\n");
+        return;
+    }
+
+    while(fread(&item, sizeof item, 1, fp) == 1)
+    {
+        if(strcmp(item.SKU, sku) != 0)
+            continue;
+
+        if(!found)
+        {
+            printf("%-15s | %-30s | %8s | %10s\n",
+                    "SKU", "NAME", "QUANTITY", "PRICE");
+            printf("----------------------------------------------------\n");
+        }
+
+        printf("%-15s | %-30s | %8d | %10.2f\n",
+                item.SKU, item.name, item.quantity, item.price);
+        found = 1;
+    }
+
+    if(ferror(fp))
+    {
+        fclose(fp);
+        fprintf(stderr,
+                "Error reading inventory\n");
+        return;
+    }
+
+    fclose(fp);
+
+    if(!found)
+        fprintf(stderr,
+                "SKU %s not found", sku);
+
+    return;
 }
